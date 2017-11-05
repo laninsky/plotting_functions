@@ -4,6 +4,10 @@ Some functions for using R to plot data prettily
 
 # PCA plot of qPCR data, displaying stage/experiment as colours/symbols
 ```
+# This function expects a pathway and name of a csv file with qPCR count data in it. In the same folder, appended by ".cols", it expects
+#you on the first line of this plain text file to give the name of the column you would like to display by colour in the PCA plot,
+#followed by the names of the columns with the count data
+
 PCA_plot_qPCR <- function(csv_file) {
 
 if(missing(csv_file)) {
@@ -14,34 +18,13 @@ library(ggplot2)
 library(ggfortify)
 
 input_data <- read.csv(csv_file)
+input_cols <- as.matrix(read.table(paste(csv_file,".cols",sep=""),sep="\t"))
+input_cols <- gsub("\\s", ".", input_cols)
 
-colour_column <- NA
+autoplot(prcomp(input_data[ , input_cols[2:(dim(input_cols)[1]),1] ]))
 
-print("Please type the name of column that you would like to use colour to represent:")
-print("You may choose out of the following columns.")
-print(colnames(input_data))
-colour_column <- readLines(con = stdin(), n=1)
-if(is.null(input_data[ , colour_column ])) {
-   print("Sorry, that does not seem to be a valid column name. Please check your spelling and try again")
-   while(is.null(input_data[ , colour_column ])) {
-      print("Please type the name of column that you would like to use colour to represent:")
-      print("You may choose out of the following columns.")
-      print(colnames(input_data))
-      colour_column <- readLines(con = stdin(), n=1)
-      if(is.null(input_data[ , colour_column ])) {
-         print("Sorry, that does not seem to be a valid column name. Please check your spelling and try again")
-      }    
-   }
+autoplot(prcomp(input_data[ , input_cols[2:(dim(input_cols)[1]),1] ]), data = input_data, colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
+
 }
-
-print("Please type the name of column that you would like to use colour to represent:")
-print("You may choose out of the following columns.")
-colour_column <- readLines(con = stdin(), n=1)
-
-
-
-
-
-
 
 ```
