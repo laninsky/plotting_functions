@@ -36,21 +36,23 @@ errPPCA <- kEstimate(pca_data_C,method="ppca",evalPcs=1:((dim(pca_data_C)[2])-1)
 errBPCA <- kEstimate(pca_data_C,method="bpca",evalPcs=1:((dim(pca_data_C)[2])-1))
 errSVDI <- kEstimate(pca_data_C,method="svdImpute",evalPcs=1:((dim(pca_data_C)[2])-1))
 errNipals <- kEstimate(pca_data_C,method="nipals",evalPcs=1:((dim(pca_data_C)[2])-1))
-errNLPCA <- kEstimate(pca_data_C,method="nlpca",evalPcs=1:((dim(pca_data_C)[2])-1))
+errNLPCA <- kEstimate(pca_data_C,method="nlpca",evalPcs=1:((dim(pca_data_C)[2])-1),maxSteps=300)
 
 header_row <- c("methods","PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")
-row_names <- c("bestNPcs","eError_1","eError_2")
-error_matrix <- matrix(NA,nrow=4,ncol=7)
+row_names <- c("bestNPcs","eError_1","eError_2","eErr_SS")
+error_matrix <- matrix(NA,nrow=5,ncol=7)
 error_matrix[1,] <- header_row
 error_matrix[2:(dim(error_matrix)[1]),1] <- row_names
 error_matrix[2:(dim(error_matrix)[1]),2] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
 error_matrix[2:(dim(error_matrix)[1]),3] <- c(errPPCA$bestNPcs,errPPCA$eError[1],errPPCA$eError[2])
 error_matrix[2:(dim(error_matrix)[1]),4] <- c(errBPCA$bestNPcs,errBPCA$eError[1],errBPCA$eError[2])
+error_matrix[2:(dim(error_matrix)[1]),5] <- c(errSVDI$bestNPcs,errSVDI$eError[1],errSVDI$eError[2])
+error_matrix[2:(dim(error_matrix)[1]),6] <- c(errNipals$bestNPcs,errNipals$eError[1],errNipals$eError[2])
+error_matrix[2:(dim(error_matrix)[1]),7] <- c(errNLPCA$bestNPcs,errNLPCA$eError[1],errNLPCA$eError[2])
 
-error_matrix[2:(dim(error_matrix)[1]),5] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
-error_matrix[2:(dim(error_matrix)[1]),6] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
-error_matrix[2:(dim(error_matrix)[1]),7] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
-
+for (i in 2:7) {
+   error_matrix[5,i] <- as.numeric(error_matrix[3,i])^2+as.numeric(error_matrix[4,i])^2
+}
 
 
 
