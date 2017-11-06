@@ -2,7 +2,7 @@
 Some functions for using R to plot data prettily
 
 
-# PCA plot of qPCR data, displaying stage/experiment as colours/symbols
+#PCA plot of qPCR data, displaying stage/overlapping experiment as colours/symbols
 ```
 # This function expects a pathway and name of a csv file with qPCR count data in it. In the same folder, appended by ".cols", it expects
 #you on the first line of this plain text file to give the name of the column you would like to display by colour in the PCA plot,
@@ -16,14 +16,30 @@ stop('Please give the full path and name of your csv file with qPCR counts e.g. 
 
 library(ggplot2)
 library(ggfortify)
+library(pcaMethods)
 
 input_data <- read.csv(csv_file)
 input_cols <- as.matrix(read.table(paste(csv_file,".cols",sep=""),sep="\t"))
 input_cols <- gsub("\\s", ".", input_cols)
 
-autoplot(prcomp(input_data[ , input_cols[2:(dim(input_cols)[1]),1] ]))
+pca_data <- input_data[ , input_cols[2:(dim(input_cols)[1]),1] ]
 
-autoplot(prcomp(input_data[ , input_cols[2:(dim(input_cols)[1]),1] ]), data = input_data, colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
+q2PPCA <- Q2((pca(pca_data, method="ppca", center=FALSE, nPcs=2)), pca_data, fold=2)
+
+
+
+resPCA <- completeObs(pca(pca_data, method="svd", center=FALSE, nPcs=2))
+resPPCA <- completeObs(pca(pca_data, method="ppca", center=FALSE, nPcs=2))
+resBPCA <- completeObs(pca(pca_data, method="bpca", center=FALSE, nPcs=2))
+resSVDI <- completeObs(pca(pca_data, method="svdImpute", center=FALSE, nPcs=2))
+resNipals <- completeObs(pca(pca_data, method="nipals", center=FALSE, nPcs=2))
+resNLPCA <- completeObs(pca(pca_data, method="nlpca", center=FALSE, nPcs=2, maxSteps=300))
+
+
+#na.omit (regular, not imputed PCA, dropping rows that do not have values in each column
+autoplot(prcomp(na.omit(input_data[ , input_cols[2:(dim(input_cols)[1]),1] ])))
+
+autoplot(prcomp(na.omit(input_data[ , input_cols[2:(dim(input_cols)[1]),1] ])), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
 
 }
 
