@@ -26,7 +26,10 @@ input_cols <- gsub("\\s", ".", input_cols)
 
 #extracting columns with numerical data and centering the values
 pca_data <- input_data[ , input_cols[2:(dim(input_cols)[1]),1] ]
-pca_data_C <- prep(pca_data, scale="none", center=TRUE)
+
+#Doing scaling using uv method
+for (scale_type in c("none","pareto","vector","uv")) {
+pca_data_C <- prep(pca_data, scale=scale_type, center=TRUE)
 
 #imputing missing data if necessary
 if(!(dim(pca_data_C)[1]==dim(na.omit(pca_data_C))[1])) {
@@ -54,7 +57,7 @@ for (i in 2:7) {
    error_matrix[5,i] <- as.numeric(error_matrix[3,i])^2+as.numeric(error_matrix[4,i])^2
 }
 
-# imputing missing data values
+# imputing missing data values for the differing numbers of principle components suggested by the kestimate step
 for (npcs in min(as.numeric(na.omit(error_matrix[2,2:7]))):max(as.numeric(na.omit(error_matrix[2,2:7])))) {
 resPCA <- completeObs(pca(na.omit(pca_data_C), method="svd", center=FALSE, nPcs=npcs))
 resPPCA <- completeObs(pca(pca_data_C, method="ppca", center=FALSE, nPcs=npcs))
@@ -62,6 +65,20 @@ resBPCA <- completeObs(pca(pca_data_C, method="bpca", center=FALSE, nPcs=npcs))
 resSVDI <- completeObs(pca(pca_data_C, method="svdImpute", center=FALSE, nPcs=npcs))
 resNipals <- completeObs(pca(pca_data_C, method="nipals", center=FALSE, nPcs=npcs))
 resNLPCA <- completeObs(pca(pca_data_C, method="nlpca", center=FALSE, nPcs=npcs, maxSteps=300))
+
+missing_rows <- attr((na.omit(pca_data_C)),"na.action")
+missing_rows <- missing_rows[1:length(missing_rows)]
+
+pcaPCA <- prcomp(resPCA)
+pcaPPCA <- prcomp(resPPCA)
+pcaBPCA <- prcomp(resBPCA)
+pcaSVDI <- prcomp(resSVDI)
+pcaNipals <- prcomp(resNipals)
+pcaNLPCA <- prcomp(resNLPCA)
+
+eigenvalue_df <- data.frame(Eigenvector=rep(c(1:length(pcaPCA$sdev)),6),Method=c(rep("PCA",3),rep("PPCA",3),rep("BPCA",3),rep("SVDI",3),rep("Nipals",3),rep("NLPCA",3)),Eigenvalue=c(pcaPCA$sdev,pcaPPCA$sdev,pcaBPCA$sdev,pcaSVDI$sdev,pcaNipals$sdev,pcaNLPCA$sdev))
+
+
 }
 
 } else {
