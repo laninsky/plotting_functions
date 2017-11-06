@@ -6,7 +6,7 @@ Some functions for using R to plot data prettily
 ```
 # This function expects a pathway and name of a csv file with qPCR count data in it. In the same folder, appended by ".cols", it expects
 #you on the first line of this plain text file to give the name of the column you would like to display by colour in the PCA plot,
-#followed by the names of the columns with the count data
+#followed by the names of the columns with the count data.
 
 PCA_plot_qPCR <- function(csv_file) {
 
@@ -32,37 +32,37 @@ pca_data_C <- prep(pca_data, scale="none", center=TRUE)
 if(!(dim(pca_data_C)[1]==dim(na.omit(pca_data_C))[1])) {
 
 errPCA  <- kEstimate(na.omit(pca_data_C),method="svd",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
-errPPCA <- kEstimate(pca_data_C,method="ppca",evalPcs=1:((dim(pca_data_C)[2])-1))
-errBPCA <- kEstimate(pca_data_C,method="bpca",evalPcs=1:((dim(pca_data_C)[2])-1))
-errSVDI <- kEstimate(pca_data_C,method="svdImpute",evalPcs=1:((dim(pca_data_C)[2])-1))
-errNipals <- kEstimate(pca_data_C,method="nipals",evalPcs=1:((dim(pca_data_C)[2])-1))
-errNLPCA <- kEstimate(pca_data_C,method="nlpca",evalPcs=1:((dim(pca_data_C)[2])-1),maxSteps=300)
+errPPCA <- kEstimate(pca_data_C,method="ppca",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
+errBPCA <- kEstimate(pca_data_C,method="bpca",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
+errSVDI <- kEstimate(pca_data_C,method="svdImpute",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
+errNipals <- kEstimate(pca_data_C,method="nipals",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
+errNLPCA <- kEstimate(pca_data_C,method="nlpca",evalPcs=1:((dim(pca_data_C)[2])-1),maxSteps=300,allVariables=TRUE)
 
 header_row <- c("methods","PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")
 row_names <- c("bestNPcs","eError_1","eError_2","eErr_SS")
 error_matrix <- matrix(NA,nrow=5,ncol=7)
 error_matrix[1,] <- header_row
 error_matrix[2:(dim(error_matrix)[1]),1] <- row_names
-error_matrix[2:(dim(error_matrix)[1]),2] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
-error_matrix[2:(dim(error_matrix)[1]),3] <- c(errPPCA$bestNPcs,errPPCA$eError[1],errPPCA$eError[2])
-error_matrix[2:(dim(error_matrix)[1]),4] <- c(errBPCA$bestNPcs,errBPCA$eError[1],errBPCA$eError[2])
-error_matrix[2:(dim(error_matrix)[1]),5] <- c(errSVDI$bestNPcs,errSVDI$eError[1],errSVDI$eError[2])
-error_matrix[2:(dim(error_matrix)[1]),6] <- c(errNipals$bestNPcs,errNipals$eError[1],errNipals$eError[2])
-error_matrix[2:(dim(error_matrix)[1]),7] <- c(errNLPCA$bestNPcs,errNLPCA$eError[1],errNLPCA$eError[2])
+error_matrix[2:4,2] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
+error_matrix[2:4,3] <- c(errPPCA$bestNPcs,errPPCA$eError[1],errPPCA$eError[2])
+error_matrix[2:4,4] <- c(errBPCA$bestNPcs,errBPCA$eError[1],errBPCA$eError[2])
+error_matrix[2:4,5] <- c(errSVDI$bestNPcs,errSVDI$eError[1],errSVDI$eError[2])
+error_matrix[2:4,6] <- c(errNipals$bestNPcs,errNipals$eError[1],errNipals$eError[2])
+error_matrix[2:4,7] <- c(errNLPCA$bestNPcs,errNLPCA$eError[1],errNLPCA$eError[2])
 
 for (i in 2:7) {
    error_matrix[5,i] <- as.numeric(error_matrix[3,i])^2+as.numeric(error_matrix[4,i])^2
 }
 
-
-
 # imputing missing data values
-resPCA <- completeObs(pca(na.omit(pca_data_C), method="svd", center=FALSE, nPcs=(dim(pca_data_C)[2])))
-resPPCA <- completeObs(pca(pca_data_C, method="ppca", center=FALSE, nPcs=(dim(pca_data_C)[2])))
-resBPCA <- completeObs(pca(pca_data_C, method="bpca", center=FALSE, nPcs=(dim(pca_data_C)[2])))
-resSVDI <- completeObs(pca(pca_data_C, method="svdImpute", center=FALSE, nPcs=(dim(pca_data_C)[2])))
-resNipals <- completeObs(pca(pca_data_C, method="nipals", center=FALSE, nPcs=(dim(pca_data_C)[2])))
-resNLPCA <- completeObs(pca(pca_data_C, method="nlpca", center=FALSE, nPcs=(dim(pca_data_C)[2])), maxSteps=300)
+for (npcs in min(as.numeric(na.omit(error_matrix[2,2:7]))):max(as.numeric(na.omit(error_matrix[2,2:7])))) {
+resPCA <- completeObs(pca(na.omit(pca_data_C), method="svd", center=FALSE, nPcs=npcs))
+resPPCA <- completeObs(pca(pca_data_C, method="ppca", center=FALSE, nPcs=npcs))
+resBPCA <- completeObs(pca(pca_data_C, method="bpca", center=FALSE, nPcs=npcs))
+resSVDI <- completeObs(pca(pca_data_C, method="svdImpute", center=FALSE, nPcs=npcs))
+resNipals <- completeObs(pca(pca_data_C, method="nipals", center=FALSE, nPcs=npcs))
+resNLPCA <- completeObs(pca(pca_data_C, method="nlpca", center=FALSE, nPcs=npcs, maxSteps=300))
+}
 
 } else {
 print("your dataset is complete, so no imputation has been performed")
