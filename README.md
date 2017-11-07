@@ -36,12 +36,13 @@ pca_data_C <- prep(pca_data, scale=scale_type, center=TRUE)
 if(!(dim(pca_data_C)[1]==dim(na.omit(pca_data_C))[1])) {
 
 #Getting error estimates for each imputation method - original PCA ("svd") is calculated by dropping all rows with NA
+#If errNLPCA throws an error try reducing the number of maxSteps
 errPCA  <- kEstimate(na.omit(pca_data_C),method="svd",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
 errPPCA <- kEstimate(pca_data_C,method="ppca",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
 errBPCA <- kEstimate(pca_data_C,method="bpca",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
 errSVDI <- kEstimate(pca_data_C,method="svdImpute",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
 errNipals <- kEstimate(pca_data_C,method="nipals",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
-errNLPCA <- kEstimate(pca_data_C,method="nlpca",evalPcs=1:((dim(pca_data_C)[2])-1),maxSteps=300,allVariables=TRUE)
+errNLPCA <- kEstimate(pca_data_C,method="nlpca",evalPcs=1:((dim(pca_data_C)[2])-1),maxSteps=100,allVariables=TRUE)
 
 #creating a matrix with the error estiamtes for each imputation method
 header_row <- c("methods","PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")
@@ -62,13 +63,14 @@ for (i in 2:7) {
 
 #Writing out the matrix - you can use this to choose the imputation method that you prefer
 dir_create_name <- paste(getwd(),"/",scale_type,sep="")
+dir.create(dir_create_name)
 write.table(error_matrix,paste(dir_create_name,"/imputation_method_error_matrix.txt",sep=""),sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE)
 
 #Loop for imputing missing data values for the differing numbers of principle components suggested by the kestimate step
 for (npcs in min(as.numeric(na.omit(error_matrix[2,2:7]))):max(as.numeric(na.omit(error_matrix[2,2:7])))) {
 
 #creating a directory for each optimal number of principle components
-dir_create_name <- paste(getwd(),"/",scale_type,"/Imputed_Data_NPcs_",npcs,sep="")
+dir_create_name <- paste(getwd(),"/",scale_type,"/Imputed_Data_assuming_NPcs_",npcs,sep="")
 dir.create(dir_create_name)
 
 #imputing missing data
@@ -96,10 +98,20 @@ eigenvalue_df <- data.frame(Eigenvalues=rep(c(1:length(pcaPCA$sdev)),6),Method=c
 
 ggplot(data=eigenvalue_df,aes(x=Eigenvalues,y=sdev,group=Method))+geom_line(aes(color=Method))+geom_point(aes(color=Method))+ggplot2::labs(title="Eigenvalue structure as obtained with different imputation methods",x="Eigenvalue", y="Standard deviation of PC")
 
-ggsave("eigenvalue_structure.pdf", plot = last_plot(), device = NULL, path = dir_create_name)
+ggsave("eigenvalue_structure.pdf", plot = last_plot(), device = "pdf", path = dir_create_name)
 
 #Looking at the loadings of each imputation method and plotting them against PCA
-loadings_df <- data.frame(Method=c(rep("PCA",3),rep("PPCA",3),rep("BPCA",3),rep("SVDI",3),rep("Nipals",3),rep("NLPCA",3)),PC1=rbind(pcaPCA$rotation,pcaPPCA$rotation,pcaBPCA$rotation,pcaSVDI$rotation,pcaNipals$rotation,pcaNLPCA$rotation)[,1],PC1=rbind(pcaPCA$rotation,pcaPPCA$rotation,pcaBPCA$rotation,pcaSVDI$rotation,pcaNipals$rotation,pcaNLPCA$rotation)[,1],PC1=rbind(pcaPCA$rotation,pcaPPCA$rotation,pcaBPCA$rotation,pcaSVDI$rotation,pcaNipals$rotation,pcaNLPCA$rotation)[,3])
+for (i in 1:length(pcaPCA$sdev)) {
+loadings_df <- data.frame(cbind(pcaPCA$rotation[,i],pcaPPCA$rotation[,i],pcaBPCA$rotation[,i],pcaSVDI$rotation[,i],pcaNipals$rotation[,i],pcaNLPCA$rotation[,i]))
+colnames(loadings_df) <- c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")
+
+ggsave(paste("loading_correlations_for_PC",i,".pdf",sep=""), plot = last_plot(), device = "pdf", path = dir_create_name)
+}
+
+
+for (pcplot in c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")) {
+   autoplot(get(paste("pca",pcplot,sep="")))
+   autoplot(get(paste("pca",pcplot,sep="")), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
 
 
 
