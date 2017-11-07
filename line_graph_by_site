@@ -1,6 +1,6 @@
 library(ggplot2)
 data <- read.csv("/Users/alanaalexander/Dropbox/Mitogenome_Phil/omega_by_site_Nov2017.csv")
 
-theme_set(theme_gray(base_size = 18))
+theme_set(theme_gray(base_size = 36))
 
 ggplot(data=data,aes(x=site,y=omega,fill=cat))+geom_col(mapping=(aes(color=cat)))+scale_fill_manual(values=c("#8c8c8c", "#ffcccc", "#000000","#ff0000"))+scale_color_manual(values=c("#d9d9d9", "#ffcccc", "#000000","#ff0000"))
