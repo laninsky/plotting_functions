@@ -111,8 +111,12 @@ ggsave(paste("loading_correlations_for_PC",i,".pdf",sep=""), plot = last_plot(),
 
 for (pcplot in c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")) {
    autoplot(get(paste("pca",pcplot,sep="")))
-   autoplot(get(paste("pca",pcplot,sep="")), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
-
+   if (pcplot=="PCA") {
+   autoplot(get(paste("pca",pcplot,sep="")), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE) } else {
+   autoplot(get(paste("pca",pcplot,sep="")), data = input_data, colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
+   }
+   ggsave(paste("pca_plot",pcplot,"_by_variable.pdf",sep=""), plot = last_plot(), device = "pdf", path = dir_create_name)
+}
 
 
 }
