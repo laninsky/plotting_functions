@@ -92,14 +92,14 @@ pcaNipals <- prcomp(resNipals)
 pcaNLPCA <- prcomp(resNLPCA)
 
 #Looking at the sdev of principle components for each imputational method and plotting this
-eigenvalue_df <- data.frame(Eigenvalues=rep(c(1:length(pcaPCA$sdev)),6),Method=c(rep("PCA",3),rep("PPCA",3),rep("BPCA",3),rep("SVDI",3),rep("Nipals",3),rep("NLPCA",3)),sdev=c(pcaPCA$sdev,pcaPPCA$sdev,pcaBPCA$sdev,pcaSVDI$sdev,pcaNipals$sdev,pcaNLPCA$sdev))
+eigenvalue_df <- data.frame(Eigenvalues=rep(c(1:length(pcaPCA$sdev)),6),Method=c(rep("PCA",(length(pcaPCA$sdev))),rep("PPCA",(length(pcaPCA$sdev))),rep("BPCA",(length(pcaPCA$sdev))),rep("SVDI",(length(pcaPCA$sdev))),rep("Nipals",(length(pcaPCA$sdev))),rep("NLPCA",(length(pcaPCA$sdev)))),sdev=c(pcaPCA$sdev,pcaPPCA$sdev,pcaBPCA$sdev,pcaSVDI$sdev,pcaNipals$sdev,pcaNLPCA$sdev))
 
-ggplot(data=eigenvalue_df,aes(x=Eigenvalues,y=sdev,group=Method))+geom_line(aes(color=Method))+geom_point(aes(color=Method))+labs(title="Eigenvalue structure as obtained with different imputation methods",x="Eigenvalue", y = "Standard deviation of PC")
+ggplot(data=eigenvalue_df,aes(x=Eigenvalues,y=sdev,group=Method))+geom_line(aes(color=Method))+geom_point(aes(color=Method))+ggplot2::labs(title="Eigenvalue structure as obtained with different imputation methods",x="Eigenvalue", y="Standard deviation of PC")
 
 ggsave("eigenvalue_structure.pdf", plot = last_plot(), device = NULL, path = dir_create_name)
 
-
-
+#Looking at the loadings of each imputation method and plotting them against PCA
+loadings_df <- data.frame(Method=c(rep("PCA",3),rep("PPCA",3),rep("BPCA",3),rep("SVDI",3),rep("Nipals",3),rep("NLPCA",3)),PC1=rbind(pcaPCA$rotation,pcaPPCA$rotation,pcaBPCA$rotation,pcaSVDI$rotation,pcaNipals$rotation,pcaNLPCA$rotation)[,1],PC1=rbind(pcaPCA$rotation,pcaPPCA$rotation,pcaBPCA$rotation,pcaSVDI$rotation,pcaNipals$rotation,pcaNLPCA$rotation)[,1],PC1=rbind(pcaPCA$rotation,pcaPPCA$rotation,pcaBPCA$rotation,pcaSVDI$rotation,pcaNipals$rotation,pcaNLPCA$rotation)[,3])
 
 
 
