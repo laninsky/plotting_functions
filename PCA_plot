@@ -1,7 +1,3 @@
-# plotting_functions
-Some functions for using R to plot data prettily
-
-
 #PCA plot, displaying stage/overlapping experiment as colours/symbols
 ```
 # This function expects a pathway and name of a csv file with qPCR count data in it. In the same folder, appended by ".cols", it expects
