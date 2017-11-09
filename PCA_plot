@@ -4,11 +4,11 @@
 #you on the first line of this plain text file to give the name of the column you would like to display by colour in the PCA plot,
 #followed by the names of the columns with the count data.
 
-PCA_plot_qPCR <- function(csv_file) {
+PCA_plot_qPCR <- function(csv_file) {  #1A
 
-if(missing(csv_file)) {
+if(missing(csv_file)) { #2A
 stop('Please give the full path and name of your csv file with qPCR counts e.g. PCA_plot_qPCR("/Users/alanaalexander/Downloads/Practice data.csv")')
-}
+} #2B
 
 #loading required libraries
 library(ggplot2)
@@ -27,30 +27,30 @@ pca_data <- input_data[ , input_cols[2:(dim(input_cols)[1]),1] ]
 #creating a column summarizing if an experiment has data or not
 col_data <- data.frame(matrix("None",ncol=1,nrow=(dim(pca_data)[1])),stringsAsFactors=FALSE)
 colnames(col_data) <- "cols_wo_data"
-for (i in 1:(dim(pca_data)[1])) {
+for (i in 1:(dim(pca_data)[1])) { #3A
    temp_col_var <- NULL
-   for (j in 1:(dim(pca_data)[2])) {
-      if(is.na(pca_data[i,j])) {
-         if(is.null(temp_col_var)) {
+   for (j in 1:(dim(pca_data)[2])) { #4A
+      if(is.na(pca_data[i,j])) { #5A
+         if(is.null(temp_col_var)) { #6A
             temp_col_var <- j
-         } else {
+         } else { #6AB
             temp_col_var <- paste(temp_col_var,"_",j,sep="")
-         }
-      }   
-    }
-    if(!(is.null(temp_col_var))) {
+         } #6B
+      } #5A  
+    } #4A
+    if(!(is.null(temp_col_var))) { #7A
       col_data[i,1] <- temp_col_var
-    }
- }   
+    } #7B
+ } #3B  
 
 input_data <- cbind(input_data,col_data)
 
 #For loop for looking at different scaling methods
-for (scale_type in c("none","pareto","vector","uv")) {
+for (scale_type in c("none","pareto","vector","uv")) { #9A
 pca_data_C <- prep(pca_data, scale=scale_type, center=TRUE)
 
 #If control structure for imputing missing data if necessary
-if(!(dim(pca_data_C)[1]==dim(na.omit(pca_data_C))[1])) {
+if(!(dim(pca_data_C)[1]==dim(na.omit(pca_data_C))[1])) { #10A
 
 #Getting error estimates for each imputation method - original PCA ("svd") is calculated by dropping all rows with NA
 #If errNLPCA throws an error try reducing the number of maxSteps
@@ -77,7 +77,7 @@ error_matrix[2:4,5] <- c(errSVDI$bestNPcs,errSVDI$eError[1],errSVDI$eError[2])
 error_matrix[2:4,6] <- c(errNipals$bestNPcs,errNipals$eError[1],errNipals$eError[2])
 error_matrix[2:4,7] <- c(errNLPCA$bestNPcs,errNLPCA$eError[1],errNLPCA$eError[2])
 
-for (i in 2:7) {
+for (i in 2:7) { #11
    error_matrix[5,i] <- as.numeric(error_matrix[3,i])^2+as.numeric(error_matrix[4,i])^2
 }
 
@@ -164,6 +164,6 @@ autoplot(prcomp(na.omit(pca_data_C)))
 
 autoplot(prcomp(na.omit(pca_data_C)), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
 
-}
+} #1B
 
 ```
