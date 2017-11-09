@@ -77,9 +77,9 @@ error_matrix[2:4,5] <- c(errSVDI$bestNPcs,errSVDI$eError[1],errSVDI$eError[2])
 error_matrix[2:4,6] <- c(errNipals$bestNPcs,errNipals$eError[1],errNipals$eError[2])
 error_matrix[2:4,7] <- c(errNLPCA$bestNPcs,errNLPCA$eError[1],errNLPCA$eError[2])
 
-for (i in 2:7) { #11
+for (i in 2:7) { #11A
    error_matrix[5,i] <- as.numeric(error_matrix[3,i])^2+as.numeric(error_matrix[4,i])^2
-}
+} #11B
 
 #Writing out the matrix - you can use this to choose the imputation method that you prefer
 dir_create_name <- paste(getwd(),"/",scale_type,sep="")
@@ -87,7 +87,7 @@ dir.create(dir_create_name)
 write.table(error_matrix,paste(dir_create_name,"/imputation_method_error_matrix.txt",sep=""),sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE)
 
 #Loop for imputing missing data values for the differing numbers of principle components suggested by the kestimate step
-for (npcs in min(as.numeric(na.omit(error_matrix[2,2:7]))):max(as.numeric(na.omit(error_matrix[2,2:7])))) {
+for (npcs in min(as.numeric(na.omit(error_matrix[2,2:7]))):max(as.numeric(na.omit(error_matrix[2,2:7])))) { #12A
 
 #creating a directory for each optimal number of principle components
 dir_create_name <- paste(getwd(),"/",scale_type,"/Imputed_Data_assuming_NPcs_",npcs,sep="")
@@ -121,48 +121,49 @@ ggplot(data=eigenvalue_df,aes(x=Eigenvalues,y=sdev,group=Method))+geom_line(aes(
 ggsave("eigenvalue_structure.pdf", plot = last_plot(), device = "pdf", path = dir_create_name)
 
 #Looking at the loadings of each imputation method and plotting them against PCA
-for (i in 1:length(pcaPCA$sdev)) {
+for (i in 1:length(pcaPCA$sdev)) { #13A
 loadings_df <- data.frame(cbind(pcaPCA$rotation[,i],pcaPPCA$rotation[,i],pcaBPCA$rotation[,i],pcaSVDI$rotation[,i],pcaNipals$rotation[,i],pcaNLPCA$rotation[,i]))
 colnames(loadings_df) <- c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")
 
 ggsave(paste("loading_correlations_for_PC",i,".pdf",sep=""), plot = last_plot(), device = "pdf", path = dir_create_name)
-}
+} #13B
 
-for (pcplot in c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")) {
+for (pcplot in c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")) { #14A
    autoplot(get(paste("pca",pcplot,sep="")))
-   if (pcplot=="PCA") {
+   if (pcplot=="PCA") { #15A
    autoplot(get(paste("pca",pcplot,sep="")), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE) } else {
    autoplot(get(paste("pca",pcplot,sep="")), data = input_data, colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
-   }
+   } #15B
    ggsave(paste("pca_plot",pcplot,"_by_variable.pdf",sep=""), plot = last_plot(), device = "pdf", path = dir_create_name)
-}
+} #14B
 
-for (pcplot in c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")) {
+for (pcplot in c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")) { #16A
    autoplot(get(paste("pca",pcplot,sep="")))
-   if (pcplot=="PCA") {
+   if (pcplot=="PCA") { #17A
    autoplot(get(paste("pca",pcplot,sep="")), data = na.omit(input_data), colour = "cols_wo_data", loadings = TRUE, loadings.label = TRUE) } else {
    autoplot(get(paste("pca",pcplot,sep="")), data = input_data, colour = "cols_wo_data", loadings = TRUE, loadings.label = TRUE)
-   }
+   } #17B
    ggsave(paste("pca_plot",pcplot,"_by_experiment.pdf",sep=""), plot = last_plot(), device = "pdf", path = dir_create_name)
-}
+} #16B
 
-}
-
-
+} #12B
 
 
 
-} else {
+
+
+} else { #10AB
 print("your dataset is complete, so no imputation has been performed")
 errPCA  <- kEstimate(na.omit(pca_data_C),method="svd",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
-
-
-}
-
+#Need to add this in
 #na.omit (regular, not imputed PCA, dropping rows that do not have values in each column
 autoplot(prcomp(na.omit(pca_data_C)))
 
 autoplot(prcomp(na.omit(pca_data_C)), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
+
+} #10B
+
+} #9B
 
 } #1B
 
