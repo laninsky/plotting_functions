@@ -7,7 +7,7 @@
 PCA_plots_and_check <- function(csv_file) {  #1A
 
 if(missing(csv_file)) { #2A
-stop('Please give the full path and name of your csv file with qPCR counts e.g. PCA_plot_qPCR("/Users/alanaalexander/Downloads/Practice data.csv")')
+stop('Please give the full path and name of your csv file with qPCR counts e.g. PCA_plots_and_check("/Users/alanaalexander/Downloads/Practice data.csv")')
 } #2B
 
 #loading required libraries
