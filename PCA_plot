@@ -173,17 +173,33 @@ for (pcplot in c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")) { #16A
 } #12B
 
 
-
-
-
 } else { #10AB
 print("your dataset is complete, so no imputation has been performed")
 errPCA  <- kEstimate(na.omit(pca_data_C),method="svd",evalPcs=1:((dim(pca_data_C)[2])-1),allVariables=TRUE)
-#Need to add this in
-#na.omit (regular, not imputed PCA, dropping rows that do not have values in each column
-autoplot(prcomp(na.omit(pca_data_C)))
+header_row <- c("methods","PCA")
+row_names <- c("bestNPcs","eError_1","eError_2","eErr_SS")
+error_matrix <- matrix(NA,nrow=5,ncol=2)
+error_matrix[1,] <- header_row
+error_matrix[2:(dim(error_matrix)[1]),1] <- row_names
 
-autoplot(prcomp(na.omit(pca_data_C)), data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
+if (length(errPCA$bestNPcs)==0) {
+   error_matrix[2:4,2] <- c(NA,errPCA$eError[1],errPCA$eError[2])
+} else {
+   error_matrix[2:4,2] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
+}
+
+dir_create_name <- paste(getwd(),"/",scale_type,sep="")
+dir.create(dir_create_name)
+write.table(error_matrix,paste(dir_create_name,"/imputation_method_error_matrix.txt",sep=""),sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE)
+npcs <- as.numeric(error_matrix[2,2])
+resPCA <- completeObs(pca(na.omit(pca_data_C), method="svd", center=FALSE, nPcs=npcs))
+pcaPCA <- prcomp(resPCA)
+eigenvalue_df <- data.frame(Eigenvalues=c(1:length(pcaPCA$sdev)),Method=rep("PCA",(length(pcaPCA$sdev))),sdev=pcaPCA$sdev)
+ggplot(data=eigenvalue_df,aes(x=Eigenvalues,y=sdev))+geom_line()+geom_point()+ggplot2::labs(title="Eigenvalue structure",x="Eigenvalue", y="Standard deviation of PC")
+ggsave("eigenvalue_structure.pdf", plot = last_plot(), device = "pdf", path = dir_create_name)
+autoplot(pcaPCA, data = na.omit(input_data), colour = input_cols[1,1], loadings = TRUE, loadings.label = TRUE)
+ggsave("pca_plotPCA_by_variable.pdf", plot = last_plot(), device = "pdf", path = dir_create_name)
+
 
 } #10B
 
