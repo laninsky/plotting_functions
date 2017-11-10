@@ -62,20 +62,42 @@ errNipals <- kEstimate(pca_data_C,method="nipals",evalPcs=1:((dim(pca_data_C)[2]
 errNLPCA <- kEstimate(pca_data_C,method="nlpca",evalPcs=1:((dim(pca_data_C)[2])-1),maxSteps=100,allVariables=TRUE)
 
 #creating a matrix with the error estiamtes for each imputation method
-#You can ignore errors similar to Error in error_matrix[2:4, 7] <- c(errNLPCA$bestNPcs, errNLPCA$eError[1],  : number of items to replace is not a multiple of replacement length
-#Just means that NLPCA has only NA values
 
 header_row <- c("methods","PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")
 row_names <- c("bestNPcs","eError_1","eError_2","eErr_SS")
 error_matrix <- matrix(NA,nrow=5,ncol=7)
 error_matrix[1,] <- header_row
 error_matrix[2:(dim(error_matrix)[1]),1] <- row_names
-error_matrix[2:4,2] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
-error_matrix[2:4,3] <- c(errPPCA$bestNPcs,errPPCA$eError[1],errPPCA$eError[2])
-error_matrix[2:4,4] <- c(errBPCA$bestNPcs,errBPCA$eError[1],errBPCA$eError[2])
-error_matrix[2:4,5] <- c(errSVDI$bestNPcs,errSVDI$eError[1],errSVDI$eError[2])
-error_matrix[2:4,6] <- c(errNipals$bestNPcs,errNipals$eError[1],errNipals$eError[2])
-error_matrix[2:4,7] <- c(errNLPCA$bestNPcs,errNLPCA$eError[1],errNLPCA$eError[2])
+if (length(errPCA$bestNPcs)==0) {
+   error_matrix[2:4,2] <- c(NA,errPCA$eError[1],errPCA$eError[2])
+} else {
+   error_matrix[2:4,2] <- c(errPCA$bestNPcs,errPCA$eError[1],errPCA$eError[2])
+}
+if (length(errPPCA$bestNPcs)==0) {
+   error_matrix[2:4,3] <- c(NA,errPPCA$eError[1],errPPCA$eError[2])
+} else {
+   error_matrix[2:4,3] <- c(errPPCA$bestNPcs,errPPCA$eError[1],errPPCA$eError[2])
+}
+if (length(errBPCA$bestNPcs)==0) {
+   error_matrix[2:4,4] <- c(NA,errBPCA$eError[1],errBPCA$eError[2])
+} else {
+   error_matrix[2:4,4] <- c(errBPCA$bestNPcs,errBPCA$eError[1],errBPCA$eError[2])
+}
+if (length(errSVDI$bestNPcs)==0) {
+   error_matrix[2:4,5] <- c(NA,errSVDI$eError[1],errSVDI$eError[2])
+} else {
+   error_matrix[2:4,5] <- c(errSVDI$bestNPcs,errSVDI$eError[1],errSVDI$eError[2])
+}
+if (length(errNipals$bestNPcs)==0) {
+   error_matrix[2:4,6] <- c(NA,errNipals$eError[1],errNipals$eError[2])
+} else {
+   error_matrix[2:4,6] <- c(errNipals$bestNPcs,errNipals$eError[1],errNipals$eError[2])
+}
+if (length(errNLPCA$bestNPcs)==0) {
+   error_matrix[2:4,7] <- c(NA,errNLPCA$eError[1],errNLPCA$eError[2])
+} else {
+   error_matrix[2:4,7] <- c(errNLPCA$bestNPcs,errNLPCA$eError[1],errNLPCA$eError[2])
+}
 
 for (i in 2:7) { #11A
    error_matrix[5,i] <- as.numeric(error_matrix[3,i])^2+as.numeric(error_matrix[4,i])^2
