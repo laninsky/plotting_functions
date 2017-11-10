@@ -146,8 +146,7 @@ ggsave("eigenvalue_structure.pdf", plot = last_plot(), device = "pdf", path = di
 for (i in 1:length(pcaPCA$sdev)) { #13A
 loadings_df <- data.frame(cbind(pcaPCA$rotation[,i],pcaPPCA$rotation[,i],pcaBPCA$rotation[,i],pcaSVDI$rotation[,i],pcaNipals$rotation[,i],pcaNLPCA$rotation[,i]))
 colnames(loadings_df) <- c("PCA","PPCA","BPCA","SVDI","Nipals","NLPCA")
-
-
+ggpairs(loadings_df)
 ggsave(paste("loading_correlations_for_PC",i,".pdf",sep=""), plot = last_plot(), device = "pdf", path = dir_create_name)
 } #13B
 
