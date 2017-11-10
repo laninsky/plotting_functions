@@ -4,7 +4,7 @@
 #you on the first line of this plain text file to give the name of the column you would like to display by colour in the PCA plot,
 #followed by the names of the columns with the count data.
 
-PCA_plot_qPCR <- function(csv_file) {  #1A
+PCA_plots_and_check <- function(csv_file) {  #1A
 
 if(missing(csv_file)) { #2A
 stop('Please give the full path and name of your csv file with qPCR counts e.g. PCA_plot_qPCR("/Users/alanaalexander/Downloads/Practice data.csv")')
