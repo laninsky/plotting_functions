@@ -23,3 +23,12 @@ s.label(pca1$li,addaxes=TRUE)
 eig.perc <- 100*pca1$eig/sum(pca1$eig)
 add.scatter.eig(eig.perc,3,1,2, ratio=.3,posi="bottomright")
 #add.scatter.eig(eig.perc,3,1,2, ratio=.3,posi="topright")
+
+#DAPC
+grp <- find.clusters(structure, max.n.clust = 10)
+# This will display a graph of the variance explained by PCA and you can chose the number of PCs to retain
+# select 1
+# select 2 clusters
+dapc1 <- dapc(structure, grp$grp)
+# This will display a graph of the variance explained by PCA and you can chose the number of PCs to retain
+#select 1
