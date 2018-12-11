@@ -13,6 +13,22 @@ library(grid)
 setwd("/Users/alanaalexander/Downloads")  
 temp <- read_table2(filename)
 
+temp
+## A tibble: 35,281 x 12
+#   Bait           BaitLength `GC%`    Tm `Masked%` MaxHomopolymer SeqComplexity MeanQuality MinQuality Ns    Gaps  Kept 
+#   <chr>               <int> <dbl> <dbl>     <int>          <int>         <dbl>       <int>      <int> <lgl> <lgl> <lgl>
+# 1 uce-271564_p1         120  45.8 100.          0              4         0.995           0          0 FALSE FALSE TRUE 
+# 2 uce-271564_p2         120  48.3 102.          0              3         0.994           0          0 FALSE FALSE TRUE 
+# 3 uce-271564_p3         120  40.8  96.8         0              3         0.992           0          0 FALSE FALSE TRUE 
+# 4 uce-271564_p4         120  48.3 102.          0              3         0.992           0          0 FALSE FALSE TRUE 
+# 5 uce-271564_p5         120  30    89.6         0              4         0.990           0          0 FALSE FALSE TRUE 
+# 6 uce-271564_p6         120  36.7  94.0         0              7         0.991           0          0 FALSE FALSE TRUE 
+# 7 uce-271564_p7         120  38.3  95.1         0              3         0.992           0          0 FALSE FALSE TRUE 
+# 8 uce-271564_p8         120  44.2  99.1         0              3         0.993           0          0 FALSE FALSE TRUE 
+# 9 uce-271564_p9         120  33.3  91.8         0              5         0.988           0          0 FALSE FALSE TRUE 
+#10 uce-271564_p10        120  39.2  95.7         0              5         0.990           0          0 FALSE FALSE TRUE 
+## ... with 35,271 more rows
+
 # Making a transparent theme (so that we don't have a whole bunch of stuff plotted for the geom_points() option
 transparent_theme <- theme(
   axis.title.x = element_blank(),
