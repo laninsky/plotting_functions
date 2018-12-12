@@ -1,6 +1,8 @@
 working_dir <- "/Users/alanaalexander"
 filename <- "dist_between_samples.txt"
 
+# The dist_between_samples.txt results from https://github.com/laninsky/distance_calcs
+
 # Plotting the distance functions
 library(readr)
 library(dplyr)
